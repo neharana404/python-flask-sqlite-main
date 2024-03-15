@@ -79,6 +79,3 @@ To run the tests, navigate to the root directory of the backend and execute the 
 
 ```bash
 pytest
-
-
-
