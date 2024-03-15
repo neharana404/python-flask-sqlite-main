@@ -55,5 +55,30 @@ To view and interact with the SQLite database directly within Visual Studio Code
     - To run a query, open a new SQL file, type your query, and then right-click on the query text and select "Run Query".
     - To view the database structure, use the SQLite Explorer which should now show the structure of the opened database.
 
+## Backend Testing
+
+The backend of the Flask application is equipped with a series of tests to ensure the correctness and robustity of the rules engine. These tests are written using the `pytest` framework.
+
+Ensure you have pytest installed in your environment to run the tests. If you haven't installed pytest, you can do so by running:
+
+```bash
+pip install pytest
+
+### Test Files
+
+The tests are organized into separate files based on the functionalities they cover:
+
+- `test_add_rule.py`: Tests the addition of new rules to the system.
+- `test_get_rules.py`: Tests the retrieval of all rules from the system.
+- `test_edit_rule.py`: Tests the update functionality for existing rules.
+- `test_delete_rule.py`: Tests the deletion of rules from the system.
+
+### Running the Tests
+
+To run the tests, navigate to the root directory of the backend and execute the following command:
+
+```bash
+pytest
+
 
 
