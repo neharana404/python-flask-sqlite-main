@@ -29,6 +29,7 @@ This Flask app, serves as a Rules Engine Service utilizing SQLite3 to perform Cr
    flask run --port 5001
 8. Access the application via http://localhost:5001 in your web browser.
 9. Run the Script: Execute the create_table.py script using Python.
+   ```bash
    python create_table.py
 
 ## Viewing the Database in VS Code
