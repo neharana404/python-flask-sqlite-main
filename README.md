@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Flask app,serves as a Rules Engine Service utilizing SQLite3 to perform Create, Read, Update, and Delete (CRUD) operations. The service allows users to define and manipulate rules, which consist of conditions that, when met, trigger defined actions.
+This Flask app, serves as a Rules Engine Service utilizing SQLite3 to perform Create, Read, Update, and Delete (CRUD) operations. The service allows users to define and manipulate rules, which consist of conditions that, when met, trigger defined actions.
 
 ## Features
 
@@ -28,6 +28,8 @@ This Flask app,serves as a Rules Engine Service utilizing SQLite3 to perform Cre
    ```bash
    flask run --port 5001
 8. Access the application via http://localhost:5001 in your web browser.
+9. Run the Script: Execute the create_table.py script using Python.
+   python create_table.py
 
 ## Viewing the Database in VS Code
 
