@@ -19,10 +19,13 @@ This Flask app,serves as a Rules Engine Service utilizing SQLite3 to perform Cre
    ```bash
    git clone https://github.com/neharana404/python-flask-sqlite-main.git
 2. Navigate to the cloned directory:
+   ```bash
    cd python-flask-sqlite-main
-3. Install required Python dependencies:
+4. Install required Python dependencies:
+   ```bash
    pip install -r requirements.txt
-4. Start the Flask server:
+6. Start the Flask server:
+   ```bash
    flask run --port 5001
-5. Access the application via http://localhost:5001 in your web browser.
+8. Access the application via http://localhost:5001 in your web browser.
 
