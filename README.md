@@ -57,7 +57,7 @@ To view and interact with the SQLite database directly within Visual Studio Code
 
 ## Backend Testing
 
-The backend of the Flask application is equipped with a series of tests to ensure the correctness and robustity of the rules engine. These tests are written using the `pytest` framework.
+The backend of the Flask application is equipped with a series of tests to ensure the correctness and robustness of the rules engine. These tests are written using the `pytest` framework.
 
 Ensure you have pytest installed in your environment to run the tests. If you haven't installed pytest, you can do so by running:
 
