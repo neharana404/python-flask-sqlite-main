@@ -28,7 +28,7 @@ This Flask app, serves as a Rules Engine Service utilizing SQLite3 to perform Cr
    ```bash
    flask run --port 5001
 8. Access the application via http://localhost:5001 in your web browser.
-9. Run the Script: Execute the create_table.py script using Python.
+9. Before using the application, you need to set up the database and create the necessary tables. This project includes a Python script `create_table.py` that        automates this process.
    ```bash
    python create_table.py
 
