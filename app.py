@@ -1,22 +1,36 @@
 from flask import Flask, request, jsonify
+import os
 import sqlite3
+import psycopg2  # Add this if you are using PostgreSQL
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 
-# Connect to SQLite Database (or any other database)
+# Choose the database configuration based on the environment
+def get_db_connection():
+    if os.getenv('FLASK_ENV') == 'production':
+        DATABASE_URL = os.getenv('DATABASE_URL')
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require', cursor_factory=RealDictCursor)
+    else:
+        conn = sqlite3.connect('users.db')
+        conn.row_factory = sqlite3.Row  # This allows us to access columns by name
+    return conn
+
+# Initialize SQLite Database (for local development)
 def init_db():
-    conn = sqlite3.connect('users.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users
-                 (uid TEXT PRIMARY KEY, 
-                  phone TEXT,
-                  name TEXT,
-                  email TEXT,
-                  age INTEGER,
-                  photo TEXT,
-                  dentalQuestions TEXT)''')
-    conn.commit()
-    conn.close()
+    if os.getenv('FLASK_ENV') != 'production':  # Only initialize SQLite in non-production environments
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS users
+                     (uid TEXT PRIMARY KEY, 
+                      phone TEXT,
+                      name TEXT,
+                      email TEXT,
+                      age INTEGER,
+                      photo TEXT,
+                      dentalQuestions TEXT)''')
+        conn.commit()
+        conn.close()
 
 init_db()
 
@@ -28,25 +42,24 @@ def add_user():
     profile_data = data.get('profileData', {})
 
     try:
-        # Connect to the database
-        conn = sqlite3.connect('users.db')
+        conn = get_db_connection()
         c = conn.cursor()
 
         # Check if idToken already exists
-        c.execute("SELECT * FROM users WHERE uid = ?", (id_token,))
+        c.execute("SELECT * FROM users WHERE uid = %s", (id_token,))
         user = c.fetchone()
 
         if user:
             # Update existing user details
             c.execute("""
                 UPDATE users 
-                SET phone = ?, 
-                    name = COALESCE(?, name), 
-                    email = COALESCE(?, email), 
-                    age = COALESCE(?, age), 
-                    photo = COALESCE(?, photo), 
-                    dentalQuestions = COALESCE(?, dentalQuestions)
-                WHERE uid = ?
+                SET phone = %s, 
+                    name = COALESCE(%s, name), 
+                    email = COALESCE(%s, email), 
+                    age = COALESCE(%s, age), 
+                    photo = COALESCE(%s, photo), 
+                    dentalQuestions = COALESCE(%s, dentalQuestions)
+                WHERE uid = %s
             """, (
                 phone_number,
                 profile_data.get('name'),
@@ -60,7 +73,7 @@ def add_user():
         else:
             c.execute("""
                 INSERT INTO users (uid, phone, name, email, age, photo, dentalQuestions) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (
                 id_token,
                 phone_number,
@@ -72,7 +85,6 @@ def add_user():
             ))
             message = "User added successfully with placeholders for profile data"
 
-        # Commit changes and close connection
         conn.commit()
         conn.close()
 
@@ -80,8 +92,6 @@ def add_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-    
-    
 @app.route('/get-user', methods=['GET'])
 def get_user():
     id_token = request.args.get('idToken')
@@ -90,25 +100,23 @@ def get_user():
         return jsonify({"error": "idToken is required"}), 400
 
     try:
-        conn = sqlite3.connect('users.db')
+        conn = get_db_connection()
         c = conn.cursor()
 
-        c.execute("SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = ?", (id_token,))
+        c.execute("SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = %s", (id_token,))
         user = c.fetchone()
         conn.close()
 
         if user:
             user_details = {
-                "phone": user[1],
-                "name": user[2],
-                "email": user[3],
-                "age": user[4],
-                "photo": user[5],
-                "dentalQuestions": user[6]
+                "phone": user['phone'],
+                "name": user['name'],
+                "email": user['email'],
+                "age": user['age'],
+                "photo": user['photo'],
+                "dentalQuestions": user['dentalQuestions']
             }
-
-            conn.close()
-            return jsonify(user), 200
+            return jsonify(user_details), 200
         else:
             return jsonify({"error": "User not found"}), 404
 
@@ -117,4 +125,3 @@ def get_user():
 
 if __name__ == '__main__':
     app.run(debug=True)
-# Temporary change to avoid duplicate build
