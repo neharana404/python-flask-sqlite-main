@@ -62,7 +62,7 @@ def add_user():
                 WHERE uid = %s
             """
             insert_query = """
-                INSERT INTO users (uid, phone, name, email, age, photo, dentalQuestions) 
+                INSERT INTO users (uid, phone, name, email, age, photo, "dentalQuestions") 
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
         else:
@@ -133,7 +133,7 @@ def get_user():
         # Determine the parameter placeholder syntax based on the environment
         if os.getenv('FLASK_ENV') == 'production':
             # PostgreSQL syntax
-            select_query = "SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = %s"
+            select_query = 'SELECT uid, phone, name, email, age, photo, "dentalQuestions" FROM users WHERE uid = %s'
         else:
             # SQLite syntax
             select_query = "SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = ?"
