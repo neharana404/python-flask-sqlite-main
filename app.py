@@ -9,9 +9,11 @@ app = Flask(__name__)
 # Choose the database configuration based on the environment
 def get_db_connection():
     if os.getenv('FLASK_ENV') == 'production':
+        print("Connecting to PostgreSQL database...")
         DATABASE_URL = os.getenv('DATABASE_URL')
         conn = psycopg2.connect(DATABASE_URL, sslmode='require', cursor_factory=RealDictCursor)
     else:
+        print("Connecting to SQLite database...")
         conn = sqlite3.connect('users.db')
         conn.row_factory = sqlite3.Row  # This allows us to access columns by name
     return conn
@@ -45,13 +47,28 @@ def add_user():
         conn = get_db_connection()
         c = conn.cursor()
 
-        # Check if idToken already exists
-        c.execute("SELECT * FROM users WHERE uid = ?", (id_token,))
-        user = c.fetchone()
-
-        if user:
-            # Update existing user details
-            c.execute("""
+        # Determine the parameter placeholder syntax based on the environment
+        if os.getenv('FLASK_ENV') == 'production':
+            # PostgreSQL syntax
+            select_query = "SELECT * FROM users WHERE uid = %s"
+            update_query = """
+                UPDATE users 
+                SET phone = %s, 
+                    name = COALESCE(%s, name), 
+                    email = COALESCE(%s, email), 
+                    age = COALESCE(%s, age), 
+                    photo = COALESCE(%s, photo), 
+                    dentalQuestions = COALESCE(%s, dentalQuestions)
+                WHERE uid = %s
+            """
+            insert_query = """
+                INSERT INTO users (uid, phone, name, email, age, photo, dentalQuestions) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+        else:
+            # SQLite syntax
+            select_query = "SELECT * FROM users WHERE uid = ?"
+            update_query = """
                 UPDATE users 
                 SET phone = ?, 
                     name = COALESCE(?, name), 
@@ -60,7 +77,19 @@ def add_user():
                     photo = COALESCE(?, photo), 
                     dentalQuestions = COALESCE(?, dentalQuestions)
                 WHERE uid = ?
-            """, (
+            """
+            insert_query = """
+                INSERT INTO users (uid, phone, name, email, age, photo, dentalQuestions) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """
+
+        # Check if idToken already exists
+        c.execute(select_query, (id_token,))
+        user = c.fetchone()
+
+        if user:
+            # Update existing user details
+            c.execute(update_query, (
                 phone_number,
                 profile_data.get('name'),
                 profile_data.get('email'),
@@ -71,10 +100,8 @@ def add_user():
             ))
             message = "User details updated successfully"
         else:
-            c.execute("""
-                INSERT INTO users (uid, phone, name, email, age, photo, dentalQuestions) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (
+            # Insert new user details
+            c.execute(insert_query, (
                 id_token,
                 phone_number,
                 profile_data.get('name'),
@@ -103,7 +130,16 @@ def get_user():
         conn = get_db_connection()
         c = conn.cursor()
 
-        c.execute("SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = ?", (id_token,))
+        # Determine the parameter placeholder syntax based on the environment
+        if os.getenv('FLASK_ENV') == 'production':
+            # PostgreSQL syntax
+            select_query = "SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = %s"
+        else:
+            # SQLite syntax
+            select_query = "SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = ?"
+
+        # Execute the query
+        c.execute(select_query, (id_token,))
         user = c.fetchone()
         conn.close()
 
