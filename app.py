@@ -59,7 +59,7 @@ def add_user():
                     email = COALESCE(%s, email), 
                     age = COALESCE(%s, age), 
                     photo = COALESCE(%s, photo), 
-                    dentalQuestions = COALESCE(%s, dentalQuestions)
+                    "dentalQuestions" = COALESCE(%s, "dentalQuestions")
                 WHERE uid = %s
             """
             insert_query = """
