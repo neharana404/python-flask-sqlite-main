@@ -46,20 +46,20 @@ def add_user():
         c = conn.cursor()
 
         # Check if idToken already exists
-        c.execute("SELECT * FROM users WHERE uid = %s", (id_token,))
+        c.execute("SELECT * FROM users WHERE uid = ?", (id_token,))
         user = c.fetchone()
 
         if user:
             # Update existing user details
             c.execute("""
                 UPDATE users 
-                SET phone = %s, 
-                    name = COALESCE(%s, name), 
-                    email = COALESCE(%s, email), 
-                    age = COALESCE(%s, age), 
-                    photo = COALESCE(%s, photo), 
-                    dentalQuestions = COALESCE(%s, dentalQuestions)
-                WHERE uid = %s
+                SET phone = ?, 
+                    name = COALESCE(?, name), 
+                    email = COALESCE(?, email), 
+                    age = COALESCE(?, age), 
+                    photo = COALESCE(?, photo), 
+                    dentalQuestions = COALESCE(?, dentalQuestions)
+                WHERE uid = ?
             """, (
                 phone_number,
                 profile_data.get('name'),
@@ -73,7 +73,7 @@ def add_user():
         else:
             c.execute("""
                 INSERT INTO users (uid, phone, name, email, age, photo, dentalQuestions) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (
                 id_token,
                 phone_number,
@@ -103,7 +103,7 @@ def get_user():
         conn = get_db_connection()
         c = conn.cursor()
 
-        c.execute("SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = %s", (id_token,))
+        c.execute("SELECT uid, phone, name, email, age, photo, dentalQuestions FROM users WHERE uid = ?", (id_token,))
         user = c.fetchone()
         conn.close()
 
