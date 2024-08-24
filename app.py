@@ -39,6 +39,7 @@ init_db()
 @app.route('/add-user', methods=['POST'])
 def add_user():
     data = request.get_json()
+    print(f"Received data: {data}")
     id_token = data.get('idToken')
     phone_number = data.get('phone')
     profile_data = data.get('profileData', {})
