@@ -91,13 +91,13 @@ def add_user():
         if user:
             # Update existing user details
             c.execute(update_query, (
-                id_token,
                 phone_number,
                 profile_data.get('name'),
                 profile_data.get('email'),
                 profile_data.get('age'),
                 profile_data.get('photo'),
-                str(profile_data.get('dentalQuestions'))
+                str(profile_data.get('dentalQuestions')),
+                id_token
             ))
             message = "User details updated successfully"
         else:
