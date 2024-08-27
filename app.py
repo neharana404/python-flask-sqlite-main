@@ -3,6 +3,7 @@ import os
 import sqlite3
 import psycopg2  # Add this if you are using PostgreSQL
 from psycopg2.extras import RealDictCursor
+import json
 
 app = Flask(__name__)
 
@@ -43,6 +44,17 @@ def add_user():
     id_token = data.get('idToken')
     phone_number = data.get('phone')
     profile_data = data.get('profileData', {})
+
+    # Default structure for dentalQuestions
+    default_dental_questions = {
+        "question1": False,
+        "question2": "",
+        "question3": False
+    }
+
+    # Use provided dentalQuestions from profile_data or fallback to default
+    dental_questions = profile_data.get('dentalQuestions', default_dental_questions)
+
 
     try:
         conn = get_db_connection()
@@ -96,7 +108,7 @@ def add_user():
                 profile_data.get('email'),
                 profile_data.get('age'),
                 profile_data.get('photo'),
-                str(profile_data.get('dentalQuestions')),
+                json.dumps(dental_questions)
                 id_token
             ))
             message = "User details updated successfully"
@@ -109,7 +121,7 @@ def add_user():
                 profile_data.get('email'),
                 profile_data.get('age'),
                 profile_data.get('photo'),
-                str(profile_data.get('dentalQuestions'))
+                json.dumps(dental_questions)
             ))
             message = "User added successfully with placeholders for profile data"
 
