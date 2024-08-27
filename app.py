@@ -108,7 +108,7 @@ def add_user():
                 profile_data.get('email'),
                 profile_data.get('age'),
                 profile_data.get('photo'),
-                json.dumps(dental_questions)
+                json.dumps(dental_questions),
                 id_token
             ))
             message = "User details updated successfully"
